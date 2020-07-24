@@ -1,14 +1,19 @@
-import { StatusBar } from "expo-status-bar";
-import React, { useState, useEffect } from "react";
-import { StyleSheet, Text, View, Button, YellowBox, Image } from "react-native";
-import { Global } from "@emotion/core";
-import ImageContainer from "./ImageContainer";
-import { ThemeProvider, withTheme } from "emotion-theming";
-import styled, { css } from "@emotion/native";
-import { MeriendaOne_400Regular } from "@expo-google-fonts/merienda-one";
-import { useFonts } from "@expo-google-fonts/inter";
+import React, {useEffect} from "react";
+import {View, Text, YellowBox} from "react-native";
+import 'react-native-gesture-handler';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+import styled from '@emotion/native'
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { AntDesign } from '@expo/vector-icons'; 
+import { MaterialIcons } from '@expo/vector-icons';
+
+import Ionicons from "@expo/vector-icons/Ionicons";
 import * as firebase from "firebase";
 import "firebase/firestore";
+
+import Collection from './Collection'
+import Index from './MainPage';
 
 YellowBox.ignoreWarnings(["Remote debugger"]);
 
@@ -23,59 +28,45 @@ var firebaseConfig = {
   measurementId: "G-7J40HFKJ8B",
 };
 // Initialize Firebase
-export default function App() {
-  const [showButton, setshowButton] = useState(true);
-  const imageList = ["test.png","test2.jpg"];
-  const [image, setimage] = useState(imageList[0]);
-  useEffect(() => {
-    firebase.initializeApp(firebaseConfig);
-    return () => {};
-  }, [firebase]);
 
-  async function triggerImage() {
-      var longueur = imageList.length;
-      var index = Math.floor(Math.random() * longueur); 
-      setimage(imageList[index]) 
-      setshowButton(!showButton)
-  }
-  return (
-    <>
-      <View style={styles.container}>
-        <Text style={{ fontSize: 28 }}>Angela App</Text>
-        {!showButton === true ? (
-          <View>
-            <Image style={{ width: 300, height: 450 }} source={require(`./assets/${image}`)}></Image>
-            <Button
-              onPress={triggerImage}
-              title="retour"
-              color="#841584"
-              accessibilityLabel="Learn more about this purple button"
-            />
-          </View>
-        ) : (
-          <Button
-            onPress={() => setshowButton(!showButton)}
-            title="DECOUVRE TON CADEAU"
-            color="#841584"
-            accessibilityLabel="Learn more about this purple button"
-          />
-        )}
-      </View>
-    </>
-  );
+const BasicView = styled.View`
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+`;
+
+function Test1() {
+    return (
+        <BasicView>
+            <Text> welthl</Text>
+        </BasicView>
+    );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 2,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "space-around",
-  },
-  appButton: {
-    borderRadius: 15,
-    fontSize: 15,
-    backgroundColor: "red",
-    color: "white",
-  },
-});
+const Tab = createBottomTabNavigator();
+export default function App() {
+    return (
+      <>
+        <NavigationContainer>
+            <Tab.Navigator
+                screenOptions={({ route }) => ({
+                  tabBarIcon: ({color,size}) => {
+                    if (route.name === 'Collection') {
+                        return <MaterialIcons name="collections" size={size} color={color} />
+                    } else if (route.name === "Cadeau du jour") {
+                        return <AntDesign name="gift" size={size} color={color} />
+                    }
+                  },
+                })}
+                tabBarOptions={{
+                  activeTintColor: '#e74c3c',
+                  inactiveTintColor: 'gray',
+                }}
+              >
+                <Tab.Screen name="Cadeau du jour" component={Index} />
+                <Tab.Screen name="Collection" component={Collection} />
+            </Tab.Navigator>
+        </NavigationContainer>
+        </>
+    );
+}
